@@ -17,7 +17,15 @@ stations = getURL("https://mesonet.climate.umt.edu/api/stations?type=csv&clean=t
 #bring in available variables
 elements = getURL("https://mesonet.climate.umt.edu/api/elements?type=csv&clean=true") %>%
   read_csv() %>%
-  arrange(Element)
+  arrange(Element) %>%
+  mutate(Units = str_remove_all(Units, 'Â'),
+         new_col_names = paste0(Element, ' (', Units, ')'))
+
+#troubleshooting data
+# temp = read_csv(paste0('~/mesonet-download-data/lololowr.csv')) %>%
+#   filter(name %in% c('air_temp','atmos_pr', 'precipit'),
+#          datetime > as.Date('2020-12-01')) %>%
+#   pivot_wider(-units)
 
 #run app
 shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
@@ -39,16 +47,16 @@ shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
                   #variable selection
                   selectInput("Variable","Variable(s)",
                               elements$Element, multiple = T)),
+           #final collumn
+           column(4, align="center", 
+                  #temporal aggregation
+                  selectInput("aggregation","Aggregation Interval",
+                              c('No Aggregation (15 Minute Data)', 'Daily', 'Monthly'), multiple = F)),
            #second collumn 
            column(4, align="center", 
                   #date selection
                   dateInput("date_start", "Start Date"),
                   dateInput("date_end", "End Date")),
-           #final collumn
-           column(4, align="center", 
-                  #temporal aggregation
-                  selectInput("aggregation","Aggregation Interval",
-                              c('No Aggregation (15 Minute Data)', 'Daily', 'Monthly'), multiple = F))
   ),
   #space for aesthetics
   headerPanel(""),
@@ -56,17 +64,27 @@ shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
   actionButton("do", "Run Request", width = '100%'),
   #space for aesthetics
   headerPanel(""),
+  hr(),
   #add a new collumn class to center the download button
   column(12, align="center",
-         uiOutput("download_button", inline = T)
-         
+         uiOutput("download_button", inline = T)),
+  hr(),
+  #add a processing message to tell the user its working
+  column(12, align = 'center',
+         conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+                          tags$div("Processing Request...",
+                                   id="loadmessage"),
+                          tags$style("#loadmessage{color: red;
+                                 font-size: 24px;
+                                 }"
+                          ))
   ),
   #error message if needed
-  mainPanel(
-    textOutput("error_message")
-  ),
+  column(12, align = 'center',
+         textOutput("error_message")
+         )
 ),
-# end of User Interface
+# end of User Interface (UI)
 # now on to the server
 server <- function(input, output, session) {
   # this is our map that we will display
@@ -98,6 +116,15 @@ server <- function(input, output, session) {
   #reactive for when the user hits the 'do' button
   observeEvent(input$do, {
     tryCatch({
+      #custom error handling condtions
+      #logical date error
+      if(input$date_start > input$date_end){
+        stop()
+      }
+      #no variable selected
+      if(is.null(input$Variable)){
+        stop()
+      }
       #define vars to name the download button
       #must define here or else reactive response from UI will change button names before processing data
       station_name = input$Station
@@ -115,7 +142,8 @@ server <- function(input, output, session) {
       if(input$aggregation == 'No Aggregation (15 Minute Data)'){
         export = temp %>% 
           pivot_wider(-units) %>%
-          select(-qc_code)
+          select(-qc_code)%>%
+          mutate(datetime = as.character(datetime))
         
         #define name for export
         name = paste0("MT_Mesonet_", station_meta$`Station ID`, '_raw_data.csv')
@@ -139,7 +167,8 @@ server <- function(input, output, session) {
           #ungroup
           ungroup() %>%
           #deslect columns that are unwated
-          select(., -c('yday', 'year'))
+          select(., -c('yday', 'year')) %>%
+          mutate(datetime = as.character(datetime))
         
         #define name for export
         name = paste0("MT_Mesonet_", station_meta$`Station ID`, '_daily_data.csv')
@@ -164,6 +193,13 @@ server <- function(input, output, session) {
         #define name for export
         name = paste0("MT_Mesonet_", station_meta$`Station ID`, '_monthly_data.csv')
       }
+      
+      # rename columns to include units 
+      new_col_names = elements %>%
+        filter(`Element ID` %in% colnames(export))
+      export = export %>% 
+        rename_at(vars(new_col_names$`Element ID`), function(x) new_col_names$new_col_names) 
+      
       #set up download file
       output$download <- downloadHandler(
         filename = function() {
@@ -180,12 +216,31 @@ server <- function(input, output, session) {
                          paste0('Download Output File for ', station_name, ' [', aggregation_name, ']'))
         }
       })
+      
+      #clear error message is there was no error
+      output$error_message <- renderText({
+        ''
+      })
 
     # general error handling to keep app from crashing  
     }, error = function(e){
-      output$error_message <- renderText({
-        'Oops, there seams to be an error...'
-      })
+      #illogical date range
+      if(input$date_start > input$date_end){
+        output$error_message <- renderText({
+          '"Start Date" must be equal to or earlier than "End Date".'
+        })
+      }
+      #no variable selected
+      if(is.null(input$Variable)){
+        output$error_message <- renderText({
+          'Please select a variable to download.'
+        })
+      }
+      else {
+        output$error_message <- renderText({
+          'Oops, there seams to be an error...'
+        })
+      }
     })
   })
 })
