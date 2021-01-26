@@ -5,7 +5,7 @@ library(leaflet.extras)
 
 setwd("/home/zhoylman/")
 
-states = rgdal::readOGR("/home/zhoylman/mesonet-dashboard/data/shp/states.shp")
+states = rgdal::readOGR("/home/zhoylman/mesonet-dashboard/data/shp/states.shp", verbose = FALSE)
 
 #define basemap function
 base_map = function(x){
