@@ -5,6 +5,7 @@ library(leaflet.extras)
 library(ncdf4)
 library(lubridate)
 library(shinythemes)
+library(RCurl)
 
 source('~/mesonet-download/R/base_map.R')
 
