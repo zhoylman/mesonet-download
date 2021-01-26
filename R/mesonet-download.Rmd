@@ -47,6 +47,15 @@ elements = getURL("https://mesonet.climate.umt.edu/api/elements?type=csv&clean=t
   mutate(Units = str_remove_all(Units, 'Â'),
          new_col_names = paste0(Element, ' (', Units, ')'))
 
+site_specific_elements = read_csv('/home/zhoylman/mesonet-download/data/site_specific_elements.csv')
+
+# site_specific_elements = getURL('https://mesonet.climate.umt.edu/api/latest?tz=US%2FMountain&simple_datetime=false&wide=false&type=csv') %>%
+#   read_csv() %>%
+#   group_by(station_key) %>%
+#   distinct(name)
+
+# write_csv(site_specific_elements, '/home/zhoylman/mesonet-download/data/site_specific_elements.csv')
+
 #troubleshooting data
 # temp = read_csv(paste0('~/mesonet-download-data/lololowr.csv')) %>%
 #   filter(name %in% c('air_temp','atmos_pr', 'precipit'),
@@ -55,60 +64,60 @@ elements = getURL("https://mesonet.climate.umt.edu/api/elements?type=csv&clean=t
 
 #run app
 shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
-  # build our UI defining that we want a vertical layout
-  verticalLayout(),
-  # first we want to display the map
-  leafletOutput("mymap"),
-  #add a space for aesthetics
-  headerPanel(""),
-  #add a horizontal line for aesthetics
-  hr(),
-  #set up a fluid row class for inputs
-  fluidRow(align = "center",
-           #first collumn (out of 12 total)
-           column(4, align="center",
-                  #station selection
-                  selectInput("Station","Station",
-                              stations$`Station name`, multiple = F),
-                  #variable selection
-                  selectInput("Variable","Variable(s)",
-                              elements$Element, multiple = T)),
-           #final collumn
-           column(4, align="center", 
-                  #temporal aggregation
-                  selectInput("aggregation","Aggregation Interval",
-                              c('No Aggregation (15 Minute Data)', 'Daily', 'Monthly'), multiple = F)),
-           #second collumn 
-           column(4, align="center", 
-                  #date selection
-                  dateInput("date_start", "Start Date"),
-                  dateInput("date_end", "End Date"))
-  ),
-  #space for aesthetics
-  headerPanel(""),
-  #action button for running request
-  actionButton("do", "Run Request", width = '100%'),
-  #space for aesthetics
-  headerPanel(""),
-  hr(),
-  #add a new collumn class to center the download button
-  column(12, align="center",
-         uiOutput("download_button", inline = T)),
-  hr(),
-  #add a processing message to tell the user its working
-  column(12, align = 'center',
-         conditionalPanel(condition="$('html').hasClass('shiny-busy')",
-                          tags$div("Processing Request...",
-                                   id="loadmessage"),
-                          tags$style("#loadmessage{color: red;
+                         # build our UI defining that we want a vertical layout
+                         verticalLayout(),
+                         # first we want to display the map
+                         leafletOutput("mymap"),
+                         #add a space for aesthetics
+                         headerPanel(""),
+                         #add a horizontal line for aesthetics
+                         hr(),
+                         #set up a fluid row class for inputs
+                         fluidRow(align = "center",
+                                  #first collumn (out of 12 total)
+                                  column(4, align="center",
+                                         #station selection
+                                         selectInput("Station","Station",
+                                                     stations$`Station name`, multiple = F),
+                                         #variable selection
+                                         selectInput("Variable","Variable(s)",
+                                                     elements$Element, multiple = T)),
+                                  #final collumn
+                                  column(4, align="center", 
+                                         #temporal aggregation
+                                         selectInput("aggregation","Aggregation Interval",
+                                                     c('No Aggregation (15 Minute Data)', 'Daily', 'Monthly'), multiple = F)),
+                                  #second collumn 
+                                  column(4, align="center", 
+                                         #date selection
+                                         dateInput("date_start", "Start Date"),
+                                         dateInput("date_end", "End Date"))
+                         ),
+                         #space for aesthetics
+                         headerPanel(""),
+                         #action button for running request
+                         actionButton("do", "Run Request", width = '100%'),
+                         #space for aesthetics
+                         headerPanel(""),
+                         hr(),
+                         #add a new collumn class to center the download button
+                         column(12, align="center",
+                                uiOutput("download_button", inline = T)),
+                         hr(),
+                         #add a processing message to tell the user its working
+                         column(12, align = 'center',
+                                conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+                                                 tags$div("Processing Request...",
+                                                          id="loadmessage"),
+                                                 tags$style("#loadmessage{color: red;
                                  font-size: 24px;
                                  }"
-                          ))
-  ),
-  #error message if needed
-  column(12, align = 'center',
-         textOutput("error_message")
-         )
+                                                 ))
+                         ),
+                         #error message if needed
+                         column(12, align = 'center',
+                                textOutput("error_message")
+                         )
 ),
 # end of User Interface (UI)
 # now on to the server
@@ -120,15 +129,20 @@ server <- function(input, output, session) {
       #add circle points for the station locations 
       #this will allow the user to select the station based on the map
       addCircleMarkers(data = stations, lat = ~Latitude, lng = ~Longitude, stroke = TRUE, layerId = ~`Station name`,
-                           fillColor = "blue", fillOpacity = 0.5, color = "black", opacity = 0.8, radius = 6, weight = 2,
-                           label = stations$`Station name`,
-                           labelOptions = labelOptions(noHide = F, direction = "bottom",
-                                                       style = list(
-                                                         "box-shadow" = "3px 3px rgba(0,0,0,0.25)",
-                                                         "font-size" = "16px"
-                                                       ))) 
+                       fillColor = "blue", fillOpacity = 0.5, color = "black", opacity = 0.8, radius = 6, weight = 2,
+                       label = stations$`Station name`,
+                       labelOptions = labelOptions(noHide = F, direction = "bottom",
+                                                   style = list(
+                                                     "box-shadow" = "3px 3px rgba(0,0,0,0.25)",
+                                                     "font-size" = "16px"
+                                                   ))) 
   })
   # Now for the truely reactive portion 
+  
+  ##############################################################################
+  ######################## DYNAMIC SELECTION UPDATE ############################
+  ##############################################################################
+  
   # This will update the station selector based on clicking on the leaflet map
   observeEvent(input$mymap_marker_click, { 
     p = input$mymap_marker_click$id   
@@ -138,6 +152,52 @@ server <- function(input, output, session) {
                       selected = p
     )
   })
+  
+  # This will update the variables that can be selected depending on what station is selected
+  observeEvent(input$Station, { 
+    #site specific variables
+    station_name = stations %>%
+      filter(`Station name` == input$Station)
+    
+    #get full station meta to update selectors
+    selectors = site_specific_elements %>%
+      filter(station_key == station_name$`Station ID`)
+    
+    #find the Element names assosiated with these
+    elements_UI = elements %>% 
+      filter(`Element ID` %in% selectors$name)
+    
+    #find valid pre selected variables to reset selected vars
+    already_selected = input$Variable[input$Variable %in% elements_UI$Element]
+    
+    #update selector based on vars assosiated with specific site 
+    #and reselect valid vars 
+    updateSelectInput(session, "Variable",
+                      label = 'Variable(s)',
+                      choices = elements_UI$Element,
+                      selected = already_selected
+    )
+  })
+  
+  observeEvent(input$Station, { 
+    #site specific date meta
+    station_meta = stations %>%
+      filter(`Station name` == input$Station) %>%
+      mutate(simple_start_date = mdy(`Start date`))
+    
+    #update the date selector so it is stire specific start date and 
+    #truncates date range to min site specific date
+    updateDateInput(session, "date_start",
+                    label = 'Start Date',
+                    value = station_meta$simple_start_date,
+                    min   = station_meta$simple_start_date)
+    
+  })
+  
+  ##############################################################################
+  ########################### DYNAMIC COMPUTATION ##############################
+  ##############################################################################
+  
   #this is the main function to crunch numbers and produce final download (tabular)
   #reactive for when the user hits the 'do' button
   observeEvent(input$do, {
@@ -244,8 +304,8 @@ server <- function(input, output, session) {
       output$error_message <- renderText({
         ''
       })
-
-    # general error handling to keep app from crashing  
+      
+      # general error handling to keep app from crashing  
     }, error = function(e){
       #custom error messages based on specific circumstances
       message = ifelse(is.null(input$Variable), 'Please select a variable to download.',
@@ -253,8 +313,8 @@ server <- function(input, output, session) {
                               '"Start Date" must be equal to or earlier than "End Date".', 'Oops, there seams to be an error...'))
       
       output$error_message <- renderText({
-          message
-        })
+        message
+      })
       
     })
   })
