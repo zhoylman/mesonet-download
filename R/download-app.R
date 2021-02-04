@@ -274,7 +274,7 @@ server <- function(input, output, session) {
           #ungroup
           ungroup() %>%
           #recreate psudo datetime for plotting
-          mutate(datetime = as.POSIXct(paste(year, month, '01', sep = "-")) %>%
+          mutate(datetime = as.POSIXct(paste(year, month, '15', sep = "-")) %>%
                    as.character()) %>%
           relocate(station_key, month, year, datetime)
         
@@ -317,10 +317,10 @@ server <- function(input, output, session) {
                                                     x = 0.5),
                                       xaxis = list(title = ""),
                                       yaxis = list(title = .x),
-                                      title= input$Station,
+                                      title= station_name,
                                       height = 500) %>%
                                config(displaylogo = FALSE,
-                                      toImageButtonOptions= list(filename = paste0(input$Station, ' ', .x),
+                                      toImageButtonOptions= list(filename = paste0(station_name, ' ', .x),
                                                                  width = 1000,
                                                                  height =  700)) %>%
                                layout(
@@ -330,9 +330,9 @@ server <- function(input, output, session) {
                                         yref = "paper",
                                         x= 0,
                                         y= 1,
-                                        sizex = 0.2,
-                                        sizey = 0.2,
-                                        opacity = 0.8
+                                        sizex = 0.1,
+                                        sizey = 0.1,
+                                        opacity = 0.5
                                    )))
                                    
                            )
