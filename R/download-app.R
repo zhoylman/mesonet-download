@@ -316,11 +316,16 @@ server <- function(input, output, session) {
                                                     xanchor = "center",  
                                                     x = 0.5),
                                       xaxis = list(title = ""),
-                                      yaxis = list(title = .x), height = 500) %>%
-                               config(displaylogo = FALSE) %>%
+                                      yaxis = list(title = .x),
+                                      title= input$Station,
+                                      height = 500) %>%
+                               config(displaylogo = FALSE,
+                                      toImageButtonOptions= list(filename = paste0(input$Station, ' ', .x),
+                                                                 width = 1000,
+                                                                 height =  700)) %>%
                                layout(
                                  images = list(
-                                   list(source = "data:image/png;base64,/home/zhoylman/mesonet-download/data/MCO_logo.png",
+                                   list(source = "https://raw.githubusercontent.com/zhoylman/mesonet-download/master/data/MCO_logo.png",
                                         xref = "paper",
                                         yref = "paper",
                                         x= 0,
