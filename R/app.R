@@ -1,26 +1,3 @@
----
-title: "Montana Mesonet Data Downloader"
-output: 
-  flexdashboard::flex_dashboard:
-    css: /home/zhoylman/mesonet-download/css/css_modifier.css
-    logo: https://climate.umt.edu/imx/MCO_logo.svg
-    theme: readable
-    navbar:
-      - { title: "MCO GitHub", href: "https://github.com/mt-climate-office", align: right }
-runtime: shiny
----
-
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-149859729-3"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag("js", new Date());
-  gtag("config", "UA-149859729-3");
-</script>
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(dplyr)
 library(readr)
 library(stringr)
@@ -408,4 +385,3 @@ server <- function(input, output, session) {
 
 
 #fin
-```
