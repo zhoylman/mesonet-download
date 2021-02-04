@@ -10,6 +10,9 @@ library(shinythemes)
 library(RCurl)
 library(tidyr)
 
+#new
+library(plotly)
+
 source('/home/zhoylman/mesonet-download/R/base_map.R')
 
 #bring in current station list
@@ -18,7 +21,7 @@ stations = getURL("https://mesonet.climate.umt.edu/api/stations?type=csv&clean=t
   arrange(`Station name`)
 
 #bring in available variables
-elements = getURL("https://mesonet.climate.umt.edu/api/elements?type=csv&clean=true") %>%
+elements = getURL("https://mesonet.climate.umt.edu/api/elements/all?type=csv&clean=true") %>%
   read_csv() %>%
   arrange(Element) %>%
   mutate(Units = str_remove_all(Units, 'Â'),
@@ -31,13 +34,18 @@ site_specific_elements = read_csv('/home/zhoylman/mesonet-download/data/site_spe
 #   group_by(station_key) %>%
 #   distinct(name)
 
+# site_specific_elements = getURL('https://mesonet.climate.umt.edu/api/observations/all?type=csv&wide=false') %>%
+#   read_csv() %>%
+#   drop_na() %>%
+#   group_by(station_key) %>%
+#   distinct(name)
+# 
 # write_csv(site_specific_elements, '/home/zhoylman/mesonet-download/data/site_specific_elements.csv')
 
 #troubleshooting data
-# temp = read_csv(paste0('~/mesonet-download-data/lololowr.csv')) %>%
-#   filter(name %in% c('air_temp','atmos_pr', 'precipit'),
-#          datetime > as.Date('2020-12-01')) %>%
-#   pivot_wider(-units)
+# temp = read_csv(paste0('~/mesonet-download-data/wsrabsaw.csv')) %>%
+#   filter(name %in% c('air_temp','atmos_pr', 'vpd_atmo', 'precipit'))%>%
+#   select(-units, -qc_code)
 
 #run app
 shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
@@ -63,7 +71,8 @@ shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
                                   column(4, align="center", 
                                          #temporal aggregation
                                          selectInput("aggregation","Aggregation Interval",
-                                                     c('No Aggregation (15 Minute Data)', 'Daily', 'Monthly'), multiple = F)),
+                                                     c('No Aggregation (15 Minute Data)', 'Daily', 'Monthly'), multiple = F,
+                                                     selected = 'Daily')),
                                   #second collumn 
                                   column(4, align="center", 
                                          #date selection
@@ -76,10 +85,6 @@ shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
                          actionButton("do", "Run Request", width = '100%'),
                          #space for aesthetics
                          headerPanel(""),
-                         hr(),
-                         #add a new collumn class to center the download button
-                         column(12, align="center",
-                                uiOutput("download_button", inline = T)),
                          hr(),
                          #add a processing message to tell the user its working
                          column(12, align = 'center',
@@ -94,11 +99,29 @@ shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
                          #error message if needed
                          column(12, align = 'center',
                                 textOutput("error_message")
-                         )
+                         ),
+                         hr(),
+                         # column(12, align = 'center',
+                         #   plotlyOutput('plotly_output')
+                         # ),
+                         column(12, align = 'center',
+                                div(
+                                  class = "container",
+                                  uiOutput("dynamic_tabs")
+                                )),
+                         headerPanel(""),
+                         headerPanel(""),
+                         headerPanel(""),
+                         hr(),
+                         #add a new collumn class to center the download button
+                         column(12, align="center",
+                                uiOutput("download_button", inline = T))
 ),
 # end of User Interface (UI)
 # now on to the server
 server <- function(input, output, session) {
+  #dynamic tabs are NULL to start
+  rv = reactiveValues(start = NULL)
   # this is our map that we will display
   #based on the base_map() function defined above
   output$mymap <- renderLeaflet({
@@ -192,6 +215,7 @@ server <- function(input, output, session) {
       #define meta data based on UI selection 
       station_meta = stations[which(stations$`Station name`==input$Station),]
       elements_meta = elements[which(elements$Element %in% input$Variable),]
+      
       #pull in the whole dataset from flat file based on UI defined station name
       temp = read_csv(paste0('/home/zhoylman/mesonet-download-data/', station_meta$`Station ID`, '.csv')) %>%
         #filter by selected vars and time
@@ -248,7 +272,11 @@ server <- function(input, output, session) {
           #pivot wider
           pivot_wider() %>%
           #ungroup
-          ungroup() 
+          ungroup() %>%
+          #recreate psudo datetime for plotting
+          mutate(datetime = as.POSIXct(paste(year, month, '01', sep = "-")) %>%
+                   as.character()) %>%
+          relocate(station_key, month, year, datetime)
         
         #define name for export
         name = paste0("MT_Mesonet_", station_meta$`Station ID`, '_monthly_data.csv')
@@ -258,6 +286,62 @@ server <- function(input, output, session) {
         filter(`Element ID` %in% colnames(export))
       export = export %>% 
         rename_at(vars(new_col_names$`Element ID`), function(x) new_col_names$new_col_names) 
+      
+      ####################### Plotting with Dynamic Tabs ###############################
+      
+      #reactive values for dynamic plot creation
+      rv$start = new_col_names$new_col_names
+      
+      output$dynamic_tabs = renderUI({
+        rv$start %>% 
+          purrr::map(~
+                       shiny::tabPanel(
+                         title = .x,
+                         div(
+                           class = "panel", 
+                           div(
+                             class = "panel-header",
+                             tags$h3(.x)
+                           ),
+                           div(
+                             class = "panel-body",
+                             
+                             export %>%
+                               pivot_longer(cols = -c(station_key, datetime)) %>% 
+                               dplyr::filter(name == .x) %>% 
+                               plot_ly(x = ~datetime %>% as.POSIXct(), y = ~value, name = ~name, color = ~name, 
+                                       showlegend=F, colors = 'black', legendgroup = ~name) %>% 
+                               add_lines() %>%
+                               layout(legend = list(orientation = "h",
+                                                    xanchor = "center",  
+                                                    x = 0.5),
+                                      xaxis = list(title = ""),
+                                      yaxis = list(title = .x), height = 500) %>%
+                               config(displaylogo = FALSE) %>%
+                               layout(
+                                 images = list(
+                                   list(source = "data:image/png;base64,/home/zhoylman/mesonet-download/data/MCO_logo.png",
+                                        xref = "paper",
+                                        yref = "paper",
+                                        x= 0,
+                                        y= 1,
+                                        sizex = 0.2,
+                                        sizey = 0.2,
+                                        opacity = 0.8
+                                   )))
+                                   
+                           )
+                         )
+                       )
+          ) -> gap
+        
+        do.call(what = tabsetPanel, 
+                args = gap %>% 
+                  append(list(type = "pills",
+                              id   = "var_tabs")))
+        
+      })
+      
       #set up download file
       output$download <- downloadHandler(
         filename = function() {
@@ -292,6 +376,6 @@ server <- function(input, output, session) {
       
     })
   })
-},  options = list(height = 1000))
+},  options = list(height = 1200))
 
 #fin

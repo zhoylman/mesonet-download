@@ -784,9 +784,6 @@ lubrecht,soilwc08
 lubrecht,soilwc20
 lubrecht,sol_radi
 lubrecht,vpd_atmo
-lubrecht,wind_dir
-lubrecht,wind_spd
-lubrecht,windgust
 mbmgtech,air_temp
 mbmgtech,atmos_pr
 mbmgtech,batt_per
