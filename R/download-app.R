@@ -71,7 +71,7 @@ shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
                                   column(4, align="center", 
                                          #temporal aggregation
                                          selectInput("aggregation","Aggregation Interval",
-                                                     c('No Aggregation (15 Minute Data)', 'Daily', 'Monthly'), multiple = F,
+                                                     c( 'Daily', 'Monthly'), multiple = F, #'No Aggregation (15 Minute Data)'
                                                      selected = 'Daily')),
                                   #second collumn 
                                   column(4, align="center", 
