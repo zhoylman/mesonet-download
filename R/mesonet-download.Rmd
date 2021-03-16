@@ -32,38 +32,31 @@ library(lubridate)
 library(shinythemes)
 library(RCurl)
 library(tidyr)
-
-#new
 library(plotly)
 
 source('/home/zhoylman/mesonet-download/R/base_map.R')
 
 #bring in current station list
-stations = getURL("https://mesonet.climate.umt.edu/api/stations?type=csv&clean=true") %>%
-  read_csv() %>%
-  arrange(`Station name`)
+stations = read_csv('/home/zhoylman/mesonet-download/data/stations_table.csv')
+# stations = getURL("https://mesonet.climate.umt.edu/api/stations?type=csv&clean=true") %>%
+#   read_csv() %>%
+#   arrange(`Station name`)
+
 
 #bring in available variables
-elements = getURL("https://mesonet.climate.umt.edu/api/elements/all?type=csv&clean=true") %>%
-  read_csv() %>%
-  arrange(Element) %>%
-  mutate(Units = str_remove_all(Units, 'Â'),
-         new_col_names = paste0(Element, ' (', Units, ')'))
+elements = read_csv('/home/zhoylman/mesonet-download/data/elements_table.csv')
+# elements = getURL("https://mesonet.climate.umt.edu/api/elements/all?type=csv&clean=true") %>%
+#   read_csv() %>%
+#   arrange(Element) %>%
+#   mutate(Units = str_remove_all(Units, 'Â'),
+#          new_col_names = paste0(Element, ' (', Units, ')'))
 
 site_specific_elements = read_csv('/home/zhoylman/mesonet-download/data/site_specific_elements.csv')
-
-# site_specific_elements = getURL('https://mesonet.climate.umt.edu/api/latest?tz=US%2FMountain&simple_datetime=false&wide=false&type=csv') %>%
-#   read_csv() %>%
-#   group_by(station_key) %>%
-#   distinct(name)
-
 # site_specific_elements = getURL('https://mesonet.climate.umt.edu/api/observations/all?type=csv&wide=false') %>%
 #   read_csv() %>%
 #   drop_na() %>%
 #   group_by(station_key) %>%
 #   distinct(name)
-# 
-# write_csv(site_specific_elements, '/home/zhoylman/mesonet-download/data/site_specific_elements.csv')
 
 #troubleshooting data
 # temp = read_csv(paste0('~/mesonet-download-data/wsrabsaw.csv')) %>%
@@ -405,7 +398,6 @@ server <- function(input, output, session) {
     })
   })
 },  options = list(height = 1200))
-
 
 #fin
 ```

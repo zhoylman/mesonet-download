@@ -48,7 +48,7 @@ site_specific_elements = read_csv('/home/zhoylman/mesonet-download/data/site_spe
 #   select(-units, -qc_code)
 
 #run app
-app = shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
+shinyApp(ui <- fluidPage(theme = shinytheme("cosmo"),
                          # build our UI defining that we want a vertical layout
                          verticalLayout(),
                          # first we want to display the map
@@ -383,6 +383,6 @@ server <- function(input, output, session) {
   })
 },  options = list(height = 1200))
 
-runApp(app)
+
 
 #fin
