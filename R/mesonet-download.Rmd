@@ -41,7 +41,7 @@ stations = read_csv('/home/zhoylman/mesonet-download/data/stations_table.csv')
 # stations = getURL("https://mesonet.climate.umt.edu/api/stations?type=csv&clean=true") %>%
 #   read_csv() %>%
 #   arrange(`Station name`)
-
+# write_csv(stations, '/home/zhoylman/mesonet-download/data/stations_table.csv')
 
 #bring in available variables
 elements = read_csv('/home/zhoylman/mesonet-download/data/elements_table.csv')
@@ -57,6 +57,7 @@ site_specific_elements = read_csv('/home/zhoylman/mesonet-download/data/site_spe
 #   drop_na() %>%
 #   group_by(station_key) %>%
 #   distinct(name)
+# write_csv(site_specific_elements,'/home/zhoylman/mesonet-download/data/site_specific_elements.csv')
 
 #troubleshooting data
 # temp = read_csv(paste0('~/mesonet-download-data/wsrabsaw.csv')) %>%

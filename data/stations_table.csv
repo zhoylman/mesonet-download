@@ -6,8 +6,10 @@ Belfry E BLM,blmbelfr,06-02399,"Sep 28, 2018",Carbon,-108.9,45.18,3914,TRUE,TRUE
 Benchland NE,mdabench,06-02636,"Apr 29, 2019",Judith Basin,-109.97,47.09,4245,TRUE,TRUE
 Benton Lake W,bentlake,06-00759,"Jul 01, 2017",Choteau,-111.47,47.69,3704,TRUE,TRUE
 Big Timber SE,wsrbigtm,z6-02273,"Jul 02, 2019",Sweetgrass,-109.83,45.74,4423,TRUE,TRUE
+Birney N,nctbirne,z6-08299,"Jun 19, 2021",NA,-106.58,45.45,NA,TRUE,TRUE
 Broadus BLM,blmbroad,06-01716,"Aug 11, 2018",Powder River,-105.36,45.44,3156,TRUE,TRUE
 Broadview E,wsrbroad,06-02400,"Sep 30, 2018",Yellowstone,-108.76,46.13,4065,TRUE,TRUE
+Busby N,nctbusby,z6-12176,"Jun 18, 2021",NA,-106.95,45.64,NA,TRUE,TRUE
 Butte MBMG MT Tech,mbmgtech,06-01545,"Sep 15, 2018",Silver Bow,-112.56,46.01,5823,TRUE,TRUE
 Capitol BLM,blmcapit,06-01730,"Aug 13, 2018",Carter,-104.14,45.32,3310,TRUE,TRUE
 Cascade E MDA,mdacasca,z6-04314,"Oct 22, 2019",Cascade,-111.62,47.28,3406,TRUE,TRUE
@@ -22,17 +24,20 @@ Conrad ARC,conradmt,06-00152,"Oct 20, 2016",Pondera,-111.93,48.31,3724,TRUE,TRUE
 Cooney Reservoir W,wsrboydw,06-02396,"Sep 21, 2018",Stillwater,-109.26,45.47,4721,TRUE,TRUE
 Corvallis ARC,corvalli,06-00151,"Sep 30, 2016",Ravalli,-114.09,46.33,3609,TRUE,TRUE
 Crow Agency E,crowagen,06-00331,"Apr 19, 2017",Big Horn,-107.44,45.59,3091,TRUE,TRUE
+Dagmar NW MDA,mdadagma,z6-04307,"Oct 02, 2019",Sheridan,-104.25,48.66,2124,FALSE,FALSE
 Dillon NE MDA,mdadillo,z6-04310,"Sep 25, 2019",Beaverhead,-112.59,45.25,5056,TRUE,TRUE
 Edgar E MDA,mdaedgar,06-01811,"May 29, 2019",Carbon,-108.86,45.46,3501,TRUE,TRUE
+Ekalaka SE,ekalakas,z6-08228,"Oct 14, 2020",NA,-104.34,45.71,NA,TRUE,TRUE
 Fort Benton E,ftbentcb,06-00763,"Sep 13, 2017",Choteau,-110.48,47.79,3241,TRUE,TRUE
 Fort Keogh ARS N,arskeogh,06-00761,"Jun 26, 2017",Custer,-105.95,46.41,2612,TRUE,TRUE
 Fort Keogh ARS SE,arskeose,06-00965,"Jun 19, 2018",Custer,-105.83,46.35,2454,TRUE,TRUE
 Fort Keogh ARS SW,arskeosw,06-00680,"Jun 26, 2018",Custer,-105.98,46.3,2792,TRUE,TRUE
+Froid NE MDA,mdafroid,z6-04312,"Oct 02, 2019",Roosevelt,-104.48,48.35,2071,TRUE,FALSE
 Gildford N MDA,mdagildf,06-02651,"Jul 03, 2019",Hill,-110.28,48.7,2805,TRUE,TRUE
 Glasgow MDA W,mdaglasw,z6-04306,"Oct 02, 2019",Valley,-106.72,48.23,2113,TRUE,TRUE
-Glendive BLM,blmglend,06-00726,"Jun 25, 2018",Dawson,-104.75,46.92,2346,TRUE,TRUE
-Harding Cutoff BLM,blmhardi,06-02188,"Aug 21, 2018","Butte,SD",-103.73,45.17,3241,TRUE,TRUE
+Glendive BLM,blmglend,z6-03546,"Jun 25, 2018",Dawson,-104.75,46.92,2346,TRUE,TRUE
 Hardin N MDA,mdahardi,z6-04305,"Oct 17, 2019",Big Horn,-107.6,45.87,2846,TRUE,TRUE
+Harding Cutoff BLM,blmhardi,06-02188,"Aug 21, 2018","Butte,SD",-103.73,45.17,3241,TRUE,TRUE
 Havre ARC,havrenmt,06-00153,"Oct 21, 2016",Hill,-109.8,48.49,2720,TRUE,TRUE
 Hogeland SE MDA,mdahogel,06-01827,"Oct 09, 2018",Blaine,-108.56,48.77,3123,TRUE,TRUE
 Hot Springs NE-L,namlower,06-00969,"Jul 30, 2018",Lake,-114.51,47.7,3415,TRUE,TRUE
@@ -48,7 +53,8 @@ Lubrecht Forest,lubrecht,06-00189,"Jun 16, 2017",Missoula,-113.44,46.89,4075,TRU
 MacDonald Pass USFS,usfsmacp,z6-11852,"Nov 16, 2018",Lewis & Clark,-112.31,46.56,6381,TRUE,TRUE
 Malta W MDA,mdamalta,06-01806,"Sep 20, 2018",Phillips,-108,48.35,2270,TRUE,TRUE
 Manhattan S MDA,mdamanha,z6-04315,"Sep 26, 2019",Gallatin,-111.32,45.79,4367,TRUE,TRUE
-McCartney Mtn BLM,blm3mcca,06-00679,"Aug 20, 2017",Beaverhead,-112.6,45.55,6240,TRUE,TRUE
+McCartney Mtn BLM,blm3mcca,z6-11460,"Aug 20, 2017",Beaverhead,-112.6,45.55,6240,TRUE,TRUE
+MDA Toston SW2,mdatost2,z6-07339,"Apr 21, 2021",NA,-111.54,46.11,NA,TRUE,TRUE
 Melville SE,wsrmelvi,z6-03211,"Jul 03, 2019",Sweet Grass,-109.84,46,4711,TRUE,TRUE
 Miles City S MDA,mdamiles,z6-04318,"Oct 16, 2019",Custer,-105.76,46.22,2477,TRUE,TRUE
 Mocassin ARC,moccasin,06-00186,"Dec 19, 2016",Judith Basin,-109.95,47.06,4265,TRUE,TRUE
@@ -67,7 +73,6 @@ Roy BLM,blmroyno,06-02380,"Aug 07, 2019",Fergus,-108.95,47.49,3087,TRUE,TRUE
 Scobey N MDA,mdascoby,z6-04317,"Oct 02, 2019",Daniels,-105.44,48.88,2408,TRUE,TRUE
 Sidney ARC,sidneymt,06-00187,"Oct 25, 2016",Richland,-104.25,47.78,2264,TRUE,TRUE
 Terry BLM,blmterry,06-02071,"Jun 26, 2018",Prarie,-105.26,46.84,2329,TRUE,TRUE
-Toston SW MDA,mdatosto,06-02649,"May 14, 2019",Broadwater,-111.53,46.12,3497,TRUE,TRUE
 Twin Bridges S MDA,mdatwinb,06-01788,"May 22, 2019",Madison,-112.36,45.47,2270,TRUE,TRUE
 Vandalia N BLM,blmglnor,06-02540,"Oct 10, 2018",Garfield,-106.91,48.51,2598,TRUE,TRUE
 Virginia City BLM,blm2virg,06-00674,"Aug 23, 2017",Madison,-111.88,45.27,7356,TRUE,TRUE
